@@ -20,9 +20,12 @@ runs:
     - id: image-metadata
       name: Extract image metadata
       run: |-
-        TAG=$(echo -n ${GITHUB_REF#refs/*/} | sed -e 's/^v//' | tr -c '[[:alnum:]]._-' '_')
+        REF_NAME=$(echo ${GITHUB_REF#refs/*/} | sed -e 's/^v//')
+        TAG=$(printf ${REF_NAME} | tr -c '[[:alnum:]]._-' '_')
+        if [[ "${REF_NAME}" == "main" || "${REF_NAME}" == "master" ]]; then TAG=latest; fi
         echo "inputs.gcp-project-id=${{ inputs.gcp-project-id }}"
         echo "inputs.image-name=${{ inputs.image-name }}"
+        echo "REF_NAME=$REF_NAME"
         echo "TAG=$TAG"
         echo "::set-output name=tag::$TAG"
         echo "::set-output name=image::$(echo "gcr.io/${{ inputs.gcp-project-id }}/${{ inputs.image-name }}:${TAG}")"
