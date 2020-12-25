@@ -1,0 +1,46 @@
+name: 'Build and Push'
+description: 'Build and push to GCR'
+inputs:
+  image-name:
+    description: 'Image name'
+    required: true
+  gcp-project-id:
+    description: 'GCP project ID'
+    required: true
+  gcp-service-account-key:
+    description: 'GCP service account key'
+    required: true
+outputs:
+  image:
+    description: 'Image address'
+    value: ${{ steps.image-metadata.image }}
+  image-tag:
+    description: 'Image tag'
+    value: ${{ steps.image-metadata.tag }}
+runs:
+  using: 'composite'
+  steps:
+    - id: image-metadata
+      name: Extract image metadata
+      run: |-
+        echo "TAG=$(echo ${{ github.event.release.tag_name }} | sed -e 's/^v//')"
+        echo "::set-output name=tag::$TAG"
+        echo "::set-output name=image::$(echo "gcr.io/${{ inputs.gcp-project-id }}/${{ inputs.image-name }}:${TAG}")"
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@master
+      with:
+        project_id: ${{ inputs.gcp-project-id }}
+        service_account_key: ${{ inputs.gcp-service-account-key }}
+    # Configure Docker to use the gcloud command-line tool as a credential helper for authentication
+    - run: |-
+        gcloud --quiet auth configure-docker
+    - name: Build image
+      run: |-
+        docker build \
+          --tag "${{ steps.image-metadata.image }}" \
+          --build-arg GITHUB_SHA="$GITHUB_SHA" \
+          --build-arg GITHUB_REF="$GITHUB_REF" \
+          .
+    - name: Publish images to GCR
+      run: |-
+        docker push "${{ steps.image-metadata.image }}"
