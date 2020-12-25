@@ -20,12 +20,12 @@ runs:
     - id: image-metadata
       name: Extract image metadata
       run: |-
-        REF_NAME=$(echo ${GITHUB_REF#refs/*/} | sed -e 's/^v//' | tr -c '[[:alnum:]]._-' '_')
+        TAG=$(echo -n ${GITHUB_REF#refs/*/} | sed -e 's/^v//' | tr -c '[[:alnum:]]._-' '_')
         echo "inputs.gcp-project-id=${{ inputs.gcp-project-id }}"
         echo "inputs.image-name=${{ inputs.image-name }}"
-        echo "REF_NAME=${REF_NAME}"
+        echo "TAG=$TAG"
         echo "::set-output name=tag::$TAG"
-        echo "::set-output name=image::$(echo "gcr.io/${{ inputs.gcp-project-id }}/${{ inputs.image-name }}:${REF_NAME}")"
+        echo "::set-output name=image::$(echo "gcr.io/${{ inputs.gcp-project-id }}/${{ inputs.image-name }}:${TAG}")"
       shell: bash
 
     # Configure Docker to use the gcloud command-line tool as a credential helper for authentication
