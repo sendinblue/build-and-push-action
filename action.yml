@@ -20,7 +20,7 @@ runs:
     - id: image-metadata
       name: Extract image metadata
       run: |-
-        echo "TAG=$(echo ${{ github.event.release.tag_name }} | sed -e 's/^v//')"
+        echo "TAG=$(echo ${GITHUB_REF#refs/*/} | sed -e 's/^v//')"
         echo "::set-output name=tag::$TAG"
         echo "::set-output name=image::$(echo "gcr.io/${{ inputs.gcp-project-id }}/${{ inputs.image-name }}:${TAG}")"
       shell: bash
@@ -33,7 +33,7 @@ runs:
     - name: Build image
       run: |-
         docker build \
-          --tag "${{ steps.image-metadata.image }}" \
+          --tag "${{ steps.image-metadata.outputs.image }}" \
           --build-arg GITHUB_SHA="$GITHUB_SHA" \
           --build-arg GITHUB_REF="$GITHUB_REF" \
           .
@@ -41,5 +41,5 @@ runs:
 
     - name: Publish images to GCR
       run: |-
-        docker push "${{ steps.image-metadata.image }}"
+        docker push "${{ steps.image-metadata.outputs.image }}"
       shell: bash
