@@ -7,6 +7,9 @@ inputs:
   gcp-project-id:
     description: 'GCP project ID'
     required: true
+  gcp-service-account-key:
+    description: 'GCP service account key'
+    required: false
 outputs:
   image:
     description: 'Image address'
@@ -31,9 +34,13 @@ runs:
         echo "::set-output name=image::$(echo "gcr.io/${{ inputs.gcp-project-id }}/${{ inputs.image-name }}:${TAG}")"
       shell: bash
 
-    # Configure Docker to use the gcloud command-line tool as a credential helper for authentication
+    # Configure Docker access to the Container Registry
     - run: |-
-        gcloud --quiet auth configure-docker
+        if [[ -z "${{ inputs.gcp-service-account-key }}" ]]; then
+          gcloud --quiet auth configure-docker
+        else
+          docker login -u _json_key -p "${{ inputs.gcp-service-account-key }}" https://gcr.io
+        fi
       shell: bash
 
     - name: Build image
