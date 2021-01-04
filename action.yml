@@ -35,11 +35,11 @@ runs:
       shell: bash
 
     # Configure Docker access to the Container Registry
-    - run: |-
+    - run: >-
         if [[ -z "${{ inputs.gcp-service-account-key }}" ]]; then
-          gcloud --quiet auth configure-docker
+          gcloud --quiet auth configure-docker;
         else
-          docker login -u _json_key -p "${{ inputs.gcp-service-account-key }}" https://gcr.io
+          docker login -u _json_key -p "${{ inputs.gcp-service-account-key }}" https://gcr.io;
         fi
       shell: bash
 
