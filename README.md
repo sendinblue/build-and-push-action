@@ -1,6 +1,7 @@
 # Build and Push Action
 
 This action performs build and push of the image to [GCR]. Particularly, it:
+- performs login to [GCR] using [JSON key file](https://cloud.google.com/container-registry/docs/advanced-authentication) method (if JSON key provided),
 - derives the proper image tag from the current branch name/Git tag, esp. 
     - removes forbidden characters (e.g. slashes) in branch names, 
     - removes `v` prefix in tags,
@@ -16,6 +17,10 @@ This action performs build and push of the image to [GCR]. Particularly, it:
 ### `gcp-project-id`
 
 **Required** ID of the project in [GCP](https://cloud.google.com/resource-manager/docs/creating-managing-projects), e.g. `my-project-1234`.
+
+### `gcp-service-account-key`
+
+Optional JSON key to get access to [GCP].
 
 ## Outputs
 
