@@ -35,3 +35,4 @@ Tag of the image, e.g. `1.0.0`.
         gcp-project-id: 'my-project-1234'
 
 [GCR]: https://cloud.google.com/container-registry
+[GCP]: https://cloud.google.com/
