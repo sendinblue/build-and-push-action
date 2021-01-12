@@ -14,7 +14,7 @@ inputs:
     description: 'Name of the Dockerfile to use'
     default: './Dockerfile'
     required: false
-  build-optons:
+  build-options:
     description: 'Additional options to pass to docker build command'
     default: ''
     required: false
