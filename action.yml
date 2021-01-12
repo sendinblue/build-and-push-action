@@ -10,6 +10,14 @@ inputs:
   gcp-service-account-key:
     description: 'GCP service account key'
     required: false
+  dockerfile:
+    description: 'Name of the Dockerfile to use'
+    default: './Dockerfile'
+    required: false
+  build-optons:
+    description: 'Additional options to pass to docker build command'
+    default: ''
+    required: false
 outputs:
   image:
     description: 'Image address'
@@ -49,8 +57,10 @@ runs:
       run: |-
         docker build \
           --tag "${{ steps.image-metadata.outputs.image }}" \
+          --file "${{ inputs.dockerfile }}" \
           --build-arg GITHUB_SHA="$GITHUB_SHA" \
           --build-arg GITHUB_REF="$GITHUB_REF" \
+          ${{ inputs.build-options }} \
           .
       shell: bash
 
