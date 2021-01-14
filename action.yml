@@ -19,7 +19,7 @@ inputs:
     default: ''
     required: false
   build-path:
-    description: 'The build-path specifies where to find the files for the “context” of the build on the Docker daemon'
+    description: 'Location of the build context for the docker build command'
     default: '.'
     required: false
 outputs:
