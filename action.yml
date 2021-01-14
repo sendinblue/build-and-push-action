@@ -18,6 +18,10 @@ inputs:
     description: 'Additional options to pass to docker build command'
     default: ''
     required: false
+  build-path:
+    description: 'Location of the build context for the docker build command'
+    default: '.'
+    required: false
 outputs:
   image:
     description: 'Image address'
@@ -61,7 +65,7 @@ runs:
           --build-arg GITHUB_SHA="$GITHUB_SHA" \
           --build-arg GITHUB_REF="$GITHUB_REF" \
           ${{ inputs.build-options }} \
-          .
+          ${{ inputs.build-path }}
       shell: bash
 
     - name: Publish images to GCR
