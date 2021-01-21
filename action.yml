@@ -22,6 +22,10 @@ inputs:
     description: 'Location of the build context for the docker build command'
     default: '.'
     required: false
+  use-buildkit:
+    description: 'Set to "1" to enable DOCKER_BUILDKIT flag'
+    default: ''
+    required: false
 outputs:
   image:
     description: 'Image address'
@@ -34,7 +38,7 @@ runs:
   steps:
     - id: image-metadata
       name: Extract image metadata
-      run: |-
+      run: |
         REF_NAME=$(echo ${GITHUB_REF#refs/*/} | sed -e 's/^v//')
         TAG=$(printf ${REF_NAME} | tr -c '[[:alnum:]]._-' '_')
         if [[ "${REF_NAME}" == "main" || "${REF_NAME}" == "master" ]]; then TAG=latest; fi
@@ -47,28 +51,30 @@ runs:
       shell: bash
 
     # Configure Docker access to the Container Registry
-    - run: |-
-        if [[ -z "$GCP_SERVICE_ACCOUNT_KEY" ]]; then \
-          gcloud --quiet auth configure-docker; \
-        else \
-          docker login -u _json_key -p "$GCP_SERVICE_ACCOUNT_KEY" https://gcr.io; \
+    - run: |
+        if [[ -z "$GCP_SERVICE_ACCOUNT_KEY" ]]; then
+          gcloud --quiet auth configure-docker
+        else
+          echo "$GCP_SERVICE_ACCOUNT_KEY" | docker login --username _json_key --password-stdin gcr.io
         fi
       env:
         GCP_SERVICE_ACCOUNT_KEY: ${{ inputs.gcp-service-account-key }}
       shell: bash
 
     - name: Build image
-      run: |-
+      env:
+        DOCKER_BUILDKIT: ${{ inputs.use-buildkit }}
+      run: |
+        if [[ -n "$DOCKER_BUILDKIT" ]]; then DOCKER_BUILDKIT_OPTIONS="--progress=plain"; fi
         docker build \
+          $DOCKER_BUILDKIT_OPTIONS \
           --tag "${{ steps.image-metadata.outputs.image }}" \
           --file "${{ inputs.dockerfile }}" \
-          --build-arg GITHUB_SHA="$GITHUB_SHA" \
-          --build-arg GITHUB_REF="$GITHUB_REF" \
           ${{ inputs.build-options }} \
           ${{ inputs.build-path }}
       shell: bash
 
     - name: Publish images to GCR
-      run: |-
+      run: |
         docker push "${{ steps.image-metadata.outputs.image }}"
       shell: bash

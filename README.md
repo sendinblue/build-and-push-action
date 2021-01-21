@@ -20,7 +20,23 @@ This action performs build and push of the image to [GCR]. Particularly, it:
 
 ### `gcp-service-account-key`
 
-Optional JSON key to get access to [GCP].
+JSON key to get access to [GCP].
+
+### `dockerfile`
+
+Name of the Dockerfile to use. Default: `./Dockerfile`.
+
+### `build-options`
+
+Additional options to pass to docker build command.
+
+### `build-path`
+
+Location of the build context for the docker build command. Default: `.`.
+
+### `use-buildkit`
+
+Flag whether to use BuldKit. Set to `1` to enable DOCKER_BUILDKIT flag.
 
 ## Outputs
 
