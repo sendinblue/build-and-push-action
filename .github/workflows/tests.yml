@@ -30,7 +30,7 @@ jobs:
           commands: docker
           assert-args: |
             ["login", "--username", "_json_key", "--password-stdin", "gcr.io"]
-            ["build", "--tag", "gcr.io/my-project-1234/example-app:test", "--file", "./Dockerfile", ]
+            ["build", "--tag", "gcr.io/my-project-1234/example-app:test", "--file", "./Dockerfile", "."]
 
       - uses: 'dimw/mockbin-action@main'
         with:
