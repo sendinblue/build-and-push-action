@@ -14,6 +14,10 @@ This action performs build and push of the image to [GCR]. Particularly, it:
 
 **Required** The name of the image to build, e.g. `example-app`.
 
+### `image-tag`
+
+Set image tag explicitly. Default: derived from the Git tag or `latest` if on master/main branch.
+
 ### `gcp-project-id`
 
 ID of the project in [GCP](https://cloud.google.com/resource-manager/docs/creating-managing-projects), 
