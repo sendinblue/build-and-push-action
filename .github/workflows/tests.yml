@@ -41,7 +41,7 @@ jobs:
           fi
 
 
-  should-use-provided-project-id:
+  should-use-provided-gcp-project-id:
     name: Should use inputs.project-id
     runs-on: ubuntu-latest
     steps:
@@ -122,7 +122,7 @@ jobs:
         with:
           image-name: 'example-app'
           image-tag: test
-          project-id: my-project-1234
+          gcp-project-id: my-project-1234
 
       - uses: 'dimw/mockbin-action@main'
         with:
@@ -134,5 +134,5 @@ jobs:
         with:
           commands: docker
           assert-args: |
-            ["build", "--tag", "registry.example.com/my-project-1234/example-app:test", "--file", "./Dockerfile", "."]
-            ["push", "registry.example.com/my-project-1234/example-app:test"]
+            ["build", "--tag", "gcr.io/my-project-1234/example-app:test", "--file", "./Dockerfile", "."]
+            ["push", "gcr.io/my-project-1234/example-app:test"]
