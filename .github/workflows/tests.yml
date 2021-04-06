@@ -3,7 +3,7 @@ on:
   push:
 jobs:
   should-set-output-image:
-    name: Should set output image
+    name: Should set outputs.image
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -14,6 +14,7 @@ jobs:
             docker
 
       - name: Act
+        id: act
         uses: './'
         with:
           image-name: 'example-app'
@@ -32,6 +33,13 @@ jobs:
             ["login", "--username", "_json_key", "--password-stdin", "gcr.io"]
             ["build", "--tag", "gcr.io/my-project-1234/example-app:test", "--file", "./Dockerfile", "."]
             ["push", "gcr.io/my-project-1234/example-app:test"]
+
+      - run: |
+          if [[ "${{ steps.act.outputs.image }}" != "gcr.io/my-project-1234/example-app:test" ]]; then
+            echo "Expected outpus.image='gcr.io/my-project-1234/example-app:test' but got '${{ steps.act.outputs.image }}'!"
+            exit 1
+          fi
+
 
   should-use-provided-project-id:
     name: Should use inputs.project-id
@@ -93,6 +101,6 @@ jobs:
         with:
           commands: docker
           assert-args: |
-            ["login", "--username", "_json_key", "--password-stdin", "gcr.io"]
+            ["login", "--username", "_json_key", "--password-stdin", "registry.example.com"]
             ["build", "--tag", "registry.example.com/my-project-1234/example-app:test", "--file", "./Dockerfile", "."]
             ["push", "registry.example.com/my-project-1234/example-app:test"]
