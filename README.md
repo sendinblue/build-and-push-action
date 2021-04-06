@@ -14,9 +14,18 @@ This action performs build and push of the image to [GCR]. Particularly, it:
 
 **Required** The name of the image to build, e.g. `example-app`.
 
+### `image-tag`
+
+Set image tag explicitly. Default: derived from the Git tag or `latest` if on master/main branch.
+
+### `registry`
+
+Registry domain. Default: `gcr.io`.
+
 ### `gcp-project-id`
 
-**Required** ID of the project in [GCP](https://cloud.google.com/resource-manager/docs/creating-managing-projects), e.g. `my-project-1234`.
+ID of the project in [GCP](https://cloud.google.com/resource-manager/docs/creating-managing-projects), 
+e.g. `my-project-1234`. Default: `.project_id` from the JSON key (`gcp-service-account-key` input).
 
 ### `gcp-service-account-key`
 

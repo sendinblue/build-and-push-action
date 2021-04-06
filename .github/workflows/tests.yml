@@ -1,0 +1,138 @@
+name: Test action
+on:
+  push:
+jobs:
+  should-set-output-image:
+    name: Should set outputs.image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: 'dimw/mockbin-action@main'
+        with:
+          commands: |
+            docker
+
+      - name: Act
+        id: act
+        uses: './'
+        with:
+          image-name: 'example-app'
+          image-tag: test
+          gcp-service-account-key: |-
+            {
+              "type": "service_account",
+              "project_id": "my-project-1234",
+              "client_email": "foo@example.com"
+            }
+
+      - uses: 'dimw/mockbin-action@main'
+        with:
+          commands: docker
+          assert-args: |
+            ["login", "--username", "_json_key", "--password-stdin", "gcr.io"]
+            ["build", "--tag", "gcr.io/my-project-1234/example-app:test", "--file", "./Dockerfile", "."]
+            ["push", "gcr.io/my-project-1234/example-app:test"]
+
+      - run: |
+          if [[ "${{ steps.act.outputs.image }}" != "gcr.io/my-project-1234/example-app:test" ]]; then
+            echo "Expected outpus.image='gcr.io/my-project-1234/example-app:test' but got '${{ steps.act.outputs.image }}'!"
+            exit 1
+          fi
+
+
+  should-use-provided-gcp-project-id:
+    name: Should use inputs.project-id
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: 'dimw/mockbin-action@main'
+        with:
+          commands: |
+            docker
+
+      - name: Act
+        uses: './'
+        with:
+          image-name: 'example-app'
+          image-tag: test
+          gcp-project-id: foo-project
+          gcp-service-account-key: |-
+            {
+              "type": "service_account",
+              "project_id": "my-project-1234",
+              "client_email": "foo@example.com"
+            }
+
+      - uses: 'dimw/mockbin-action@main'
+        with:
+          commands: docker
+          assert-args: |
+            ["login", "--username", "_json_key", "--password-stdin", "gcr.io"]
+            ["build", "--tag", "gcr.io/foo-project/example-app:test", "--file", "./Dockerfile", "."]
+            ["push", "gcr.io/foo-project/example-app:test"]
+
+  should-use-provided-registry:
+    name: Should use inputs.registry
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: 'dimw/mockbin-action@main'
+        with:
+          commands: |
+            docker
+
+      - name: Act
+        uses: './'
+        with:
+          image-name: 'example-app'
+          image-tag: test
+          registry: registry.example.com
+          gcp-service-account-key: |-
+            {
+              "type": "service_account",
+              "project_id": "my-project-1234",
+              "client_email": "foo@example.com"
+            }
+
+      - uses: 'dimw/mockbin-action@main'
+        with:
+          commands: docker
+          assert-args: |
+            ["login", "--username", "_json_key", "--password-stdin", "registry.example.com"]
+            ["build", "--tag", "registry.example.com/my-project-1234/example-app:test", "--file", "./Dockerfile", "."]
+            ["push", "registry.example.com/my-project-1234/example-app:test"]
+
+  should-use-gcloud-if-no-key:
+    name: Should use gcloud if no GCR key provided
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: 'dimw/mockbin-action@main'
+        with:
+          commands: |
+            docker
+            gcloud
+
+      - name: Act
+        uses: './'
+        with:
+          image-name: 'example-app'
+          image-tag: test
+          gcp-project-id: my-project-1234
+
+      - uses: 'dimw/mockbin-action@main'
+        with:
+          commands: gcloud
+          assert-args: |
+            ["--quiet", "auth", "configure-docker", "gcr.io"]
+
+      - uses: 'dimw/mockbin-action@main'
+        with:
+          commands: docker
+          assert-args: |
+            ["build", "--tag", "gcr.io/my-project-1234/example-app:test", "--file", "./Dockerfile", "."]
+            ["push", "gcr.io/my-project-1234/example-app:test"]
