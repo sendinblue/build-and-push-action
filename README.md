@@ -51,11 +51,19 @@ Flag whether to use BuldKit. Set to `1` to enable DOCKER_BUILDKIT flag.
 
 ### `image`
 
-Full image path in [GCR], e.g. `gcr.io/my-project-1234/example-app:1.0.0`.
+Full image path in the registry, e.g. `gcr.io/my-project-1234/example-app:1.0.0`.
 
 ### `image-tag`
 
 Tag of the image, e.g. `1.0.0`.
+
+### `image-digest`
+
+Digest of the image, e.g. `sha256:8414aa82208bc4c2761dc149df67e25c6b8a9380e5d8c4e7b5c84ca2d04bb244`.
+
+### `image-full-name`
+
+Full image name (without the tag), e.g. `gcr.io/my-project-1234/example-app`.
 
 ## Example usage
 
