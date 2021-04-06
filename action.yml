@@ -76,6 +76,7 @@ runs:
     # Configure Docker access to the Container Registry
     - env:
         GCP_SERVICE_ACCOUNT_KEY: ${{ inputs.gcp-service-account-key }}
+        REGISTRY: ${{ inputs.registry }}
       run: |
         if [[ -z "$GCP_SERVICE_ACCOUNT_KEY" ]]; then
           gcloud --quiet auth configure-docker
