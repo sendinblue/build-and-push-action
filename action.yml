@@ -62,9 +62,9 @@ runs:
       run: |
         if [[ -z "$IMAGE_TAG" ]]; then
           REF_NAME=$(echo ${GITHUB_REF#refs/*/} | sed -e 's/^v//')
-          TAG=$(printf ${REF_NAME} | tr -c '[[:alnum:]]._-' '_')
+          IMAGE_TAG=$(printf ${REF_NAME} | tr -c '[[:alnum:]]._-' '_')
           if [[ "${REF_NAME}" == "main" || "$REF_NAME" == "master" ]]; then
-            TAG=latest
+            IMAGE_TAG=latest
           fi
         fi
 
