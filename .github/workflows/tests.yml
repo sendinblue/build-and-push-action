@@ -128,7 +128,7 @@ jobs:
         with:
           commands: gcloud
           assert-args: |
-            ["--quiet", "auth", "configure-docker"]
+            ["--quiet", "auth", "configure-docker", "gcr.io"]
 
       - uses: 'dimw/mockbin-action@main'
         with:
