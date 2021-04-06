@@ -78,7 +78,7 @@ runs:
         echo "IMAGE_TAG=$IMAGE_TAG"
         IMAGE_FULL_NAME="${REGISTRY}/${GCP_PROJECT_ID}/${IMAGE_NAME}"
 
-        echo "::set-output name=image-tag::${TAG}"
+        echo "::set-output name=image-tag::${IMAGE_TAG}"
         echo "::set-output name=image-full-name::${IMAGE_FULL_NAME}"
         echo "::set-output name=image::$(echo "${IMAGE_FULL_NAME}:${IMAGE_TAG}")"
       shell: bash
