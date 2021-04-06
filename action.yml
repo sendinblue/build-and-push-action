@@ -6,7 +6,7 @@ inputs:
     required: true
   gcp-project-id:
     description: 'GCP project ID'
-    required: true
+    required: false
   gcp-service-account-key:
     description: 'GCP service account key'
     required: false
@@ -38,27 +38,32 @@ runs:
   steps:
     - id: image-metadata
       name: Extract image metadata
+      env:
+        IMAGE_NAME: ${{ inputs.image-name }}
+        GCP_PROJECT_ID: ${{ inputs.gcp-project-id }}
+        GCP_SERVICE_ACCOUNT_KEY: ${{ inputs.gcp-service-account-key }}
       run: |
         REF_NAME=$(echo ${GITHUB_REF#refs/*/} | sed -e 's/^v//')
         TAG=$(printf ${REF_NAME} | tr -c '[[:alnum:]]._-' '_')
-        if [[ "${REF_NAME}" == "main" || "${REF_NAME}" == "master" ]]; then TAG=latest; fi
-        echo "inputs.gcp-project-id=${{ inputs.gcp-project-id }}"
-        echo "inputs.image-name=${{ inputs.image-name }}"
+        if [[ "${REF_NAME}" == "main" || "$REF_NAME" == "master" ]]; then TAG=latest; fi
+        if [[ -z "${GCP_PROJECT_ID}" ]]; then GCP_PROJECT_ID="$(echo "$GCP_SERVICE_ACCOUNT_KEY" | jq -r .project_id)"; fi
+        echo "inputs.gcp-project-id=$GCP_PROJECT_ID"
+        echo "inputs.image-name=$IMAGE_NAME"
         echo "REF_NAME=$REF_NAME"
         echo "TAG=$TAG"
         echo "::set-output name=tag::$TAG"
-        echo "::set-output name=image::$(echo "gcr.io/${{ inputs.gcp-project-id }}/${{ inputs.image-name }}:${TAG}")"
+        echo "::set-output name=image::$(echo "gcr.io/${GCP_PROJECT_ID}/${IMAGE_NAME}:${TAG}")"
       shell: bash
 
     # Configure Docker access to the Container Registry
-    - run: |
+    - env:
+        GCP_SERVICE_ACCOUNT_KEY: ${{ inputs.gcp-service-account-key }}
+      run: |
         if [[ -z "$GCP_SERVICE_ACCOUNT_KEY" ]]; then
           gcloud --quiet auth configure-docker
         else
           echo "$GCP_SERVICE_ACCOUNT_KEY" | docker login --username _json_key --password-stdin gcr.io
         fi
-      env:
-        GCP_SERVICE_ACCOUNT_KEY: ${{ inputs.gcp-service-account-key }}
       shell: bash
 
     - name: Build image

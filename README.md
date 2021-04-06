@@ -16,7 +16,8 @@ This action performs build and push of the image to [GCR]. Particularly, it:
 
 ### `gcp-project-id`
 
-**Required** ID of the project in [GCP](https://cloud.google.com/resource-manager/docs/creating-managing-projects), e.g. `my-project-1234`.
+ID of the project in [GCP](https://cloud.google.com/resource-manager/docs/creating-managing-projects), 
+e.g. `my-project-1234`. Default: `.project_id` from the JSON key (`gcp-service-account-key` input).
 
 ### `gcp-service-account-key`
 
