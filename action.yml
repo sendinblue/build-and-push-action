@@ -79,7 +79,7 @@ runs:
         REGISTRY: ${{ inputs.registry }}
       run: |
         if [[ -z "$GCP_SERVICE_ACCOUNT_KEY" ]]; then
-          gcloud --quiet auth configure-docker
+          gcloud --quiet auth configure-docker gcr.io
         else
           echo "$GCP_SERVICE_ACCOUNT_KEY" | docker login --username _json_key --password-stdin "${REGISTRY}"
         fi
