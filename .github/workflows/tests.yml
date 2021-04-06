@@ -104,3 +104,35 @@ jobs:
             ["login", "--username", "_json_key", "--password-stdin", "registry.example.com"]
             ["build", "--tag", "registry.example.com/my-project-1234/example-app:test", "--file", "./Dockerfile", "."]
             ["push", "registry.example.com/my-project-1234/example-app:test"]
+
+  should-use-gcloud-if-no-key:
+    name: Should use gcloud if no GCR key provided
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: 'dimw/mockbin-action@main'
+        with:
+          commands: |
+            docker
+            gcloud
+
+      - name: Act
+        uses: './'
+        with:
+          image-name: 'example-app'
+          image-tag: test
+          project-id: my-project-1234
+
+      - uses: 'dimw/mockbin-action@main'
+        with:
+          commands: gcloud
+          assert-args: |
+            ["--quiet", "auth", "configure-docker"]
+
+      - uses: 'dimw/mockbin-action@main'
+        with:
+          commands: docker
+          assert-args: |
+            ["build", "--tag", "registry.example.com/my-project-1234/example-app:test", "--file", "./Dockerfile", "."]
+            ["push", "registry.example.com/my-project-1234/example-app:test"]
