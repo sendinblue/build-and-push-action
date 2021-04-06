@@ -18,6 +18,10 @@ This action performs build and push of the image to [GCR]. Particularly, it:
 
 Set image tag explicitly. Default: derived from the Git tag or `latest` if on master/main branch.
 
+### `registry`
+
+Registry domain. Default: `gcr.io`.
+
 ### `gcp-project-id`
 
 ID of the project in [GCP](https://cloud.google.com/resource-manager/docs/creating-managing-projects), 
