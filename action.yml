@@ -40,7 +40,7 @@ outputs:
     value: ${{ steps.image-metadata.outputs.image }}
   image-tag:
     description: 'Image tag'
-    value: ${{ steps.image-metadata.outputs.tag }}
+    value: ${{ steps.image-metadata.outputs.image-tag }}
   image-full-name:
     description: 'Image name'
     value: ${{ steps.image-metadata.outputs.image-full-name }}
@@ -78,8 +78,8 @@ runs:
         echo "IMAGE_TAG=$IMAGE_TAG"
         IMAGE_FULL_NAME="${REGISTRY}/${GCP_PROJECT_ID}/${IMAGE_NAME}"
 
-        echo "::set-output name=tag::${TAG}"
-        echo "::set-output name=full-name::${IMAGE_FULL_NAME}"
+        echo "::set-output name=image-tag::${TAG}"
+        echo "::set-output name=image-full-name::${IMAGE_FULL_NAME}"
         echo "::set-output name=image::$(echo "${IMAGE_FULL_NAME}:${IMAGE_TAG}")"
       shell: bash
 
