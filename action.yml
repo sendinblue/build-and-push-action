@@ -41,6 +41,13 @@ outputs:
   image-tag:
     description: 'Image tag'
     value: ${{ steps.image-metadata.outputs.tag }}
+  image-full-name:
+    description: 'Image name'
+    value: ${{ steps.image-metadata.outputs.image-full-name }}
+  image-digest:
+    description: 'Image digest'
+    value: ${{ steps.push-image.outputs.image-digest }}
+
 runs:
   using: 'composite'
   steps:
@@ -69,8 +76,11 @@ runs:
         echo "inputs.image-name=$IMAGE_NAME"
         echo "REF_NAME=$REF_NAME"
         echo "IMAGE_TAG=$IMAGE_TAG"
+        IMAGE_FULL_NAME="${REGISTRY}/${GCP_PROJECT_ID}/${IMAGE_NAME}"
 
-        echo "::set-output name=image::$(echo "${REGISTRY}/${GCP_PROJECT_ID}/${IMAGE_NAME}:${IMAGE_TAG}")"
+        echo "::set-output name=tag::${TAG}"
+        echo "::set-output name=full-name::${IMAGE_FULL_NAME}"
+        echo "::set-output name=image::$(echo "${IMAGE_FULL_NAME}:${IMAGE_TAG}")"
       shell: bash
 
     # Configure Docker access to the Container Registry
@@ -98,7 +108,14 @@ runs:
           ${{ inputs.build-path }}
       shell: bash
 
-    - name: Publish images to GCR
+    - id: push-image
+      name: Push image to the registry
       run: |
         docker push "${{ steps.image-metadata.outputs.image }}"
+        IMAGE_DIGEST=$(docker inspect "${{ steps.image-metadata.outputs.image }}" \
+            | jq -r '.[0].RepoDigests[0]' \
+            | cut -d'@' -f2)
+
+        echo "IMAGE_DIGEST=${IMAGE_DIGEST}"
+        echo "::set-output name=image-digest::${IMAGE_DIGEST}"
       shell: bash
