@@ -68,9 +68,7 @@ runs:
           fi
         fi
 
-        if [[ -z "${GCP_PROJECT_ID}" ]]; then
-          GCP_PROJECT_ID="$(echo "$GCP_SERVICE_ACCOUNT_KEY" | jq -r .project_id)"
-        fi
+        GCP_PROJECT_ID="$(echo "$GCP_PROJECT_ID" | jq -r .project_id)"
 
         echo "inputs.gcp-project-id=$GCP_PROJECT_ID"
         echo "inputs.image-name=$IMAGE_NAME"
